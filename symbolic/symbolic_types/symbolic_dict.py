@@ -15,18 +15,25 @@ class SymbolicDict(SymbolicObject,dict):
 		self = dict.__new__(cls,args,kwargs)
 		return self
 
-	def __init__(self, name, kwargs):
-		SymbolicObject.__init__(self,name,None)
-		dict.__init__(self,kwargs)
+	def __init__(self, name, kwargs, expr=None):
+		from . import getSymbolic
+		symb_kwargs = {}
+		for k in kwargs:
+			symb_kwargs[k] = getSymbolic(kwargs[k])("{}__{}".format(name, k), kwargs[k])
+		SymbolicObject.__init__(self,name,expr)
+		dict.__init__(self,symb_kwargs)
 
 	def getConcrValue(self):
-		return self
+		val = {}
+		for k in self.keys():
+			val[k] = self[k].getConcrValue()
+		return val
 		
 	def __bool__(self):
 		return bool(len(self))
 
-#	def wrap(conc,sym):
-#		pass # TODO
+	def wrap(conc,sym):
+		return SymbolicDict("se", conc, sym)
 
 #	def __getitem__(self,key):
 #		val = super.__getitem__(key)
