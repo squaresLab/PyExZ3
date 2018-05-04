@@ -7,9 +7,8 @@ from . symbolic_type import SymbolicObject
 # keys of dictionary must be immutable
 # values in dictionary may be mutable
 
-
-# TODO: big simplification: can only initialize with
-# an empty dictionary
+# TODO simplification: Dictionary keys are not symbolic but all values of a symbolic
+# dictionary are symbolic.
 class SymbolicDict(SymbolicObject,dict):
 	def __new__(cls, name, *args, **kwargs):
 		self = dict.__new__(cls,args,kwargs)
@@ -19,6 +18,7 @@ class SymbolicDict(SymbolicObject,dict):
 		from . import getSymbolic
 		symb_kwargs = {}
 		for k in kwargs:
+			# Make a symbolic object for all values in this dictionary
 			symb_kwargs[k] = getSymbolic(kwargs[k])("{}__{}".format(name, k), kwargs[k])
 		SymbolicObject.__init__(self,name,expr)
 		dict.__init__(self,symb_kwargs)
