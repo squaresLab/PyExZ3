@@ -82,7 +82,23 @@ class ExplorationEngine:
 	# private
 
 	def _updateSymbolicParameter(self, name, val):
-		self.symbolic_inputs[name] = self.invocation.createArgumentValue(name,val)
+		n, v = self._getDicAndValue(name, val)
+		self.symbolic_inputs[n] = self.invocation.createArgumentValue(n,v)
+
+	def _getDicAndValue(self, name, val):
+		if "__" in name: # This means the parameter is a dictionary key
+			split = name.split("__")
+			dic, ind = split[0], split[-1]
+			current = self._getConcrValue(self.symbolic_inputs[dic])
+			temp = current
+			for s in split[1:-1]:
+				temp = temp[s]
+			temp[ind] = val
+
+			return dic, current
+		else:
+			return name, val
+
 
 	def _getInputs(self):
 		return self.symbolic_inputs.copy()
